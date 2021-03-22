@@ -215,17 +215,6 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
-                <configuration>
-                    <release>${maven.compiler.release}</release>
-                    <compilerArgs>
-                        <!--<arg>- -enable-preview</arg>-->
-                    </compilerArgs>
-                </configuration>
             </plugin>    
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -240,10 +229,18 @@
                 </executions>
                 <configuration>
                     <mainClass>com.github.noony.app.gpsfx.Main</mainClass>
-                    <!--                    <compilerArgs>
-                        <arg> - -enable-preview</arg>
+                    <compilerArgs>
                     </compilerArgs>
-                    <argLine>- -enable-preview</argLine>-->
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <release>${maven.compiler.release}</release>
+                    <compilerArgs>
+                    </compilerArgs>
                 </configuration>
             </plugin>
         </plugins>
