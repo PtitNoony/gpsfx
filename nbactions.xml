@@ -2,28 +2,36 @@
 <actions>
     <action>
         <actionName>run</actionName>
+        <packagings>
+            <packaging>jar</packaging>
+        </packagings>
         <goals>
-            <goal>clean</goal>
-            <goal>package</goal>
-            <goal>org.codehaus.mojo:exec-maven-plugin:1.6.0:java</goal>
+            <goal>process-classes</goal>
+            <goal>org.codehaus.mojo:exec-maven-plugin:3.0.0:exec</goal>
+            
             <mainClass>com.github.noony.app.gpsfx.Main</mainClass>
         </goals>
         <mainClass>com.github.noony.app.gpsfx.Main</mainClass>
         <properties>
-            <mainClass>com.github.noony.app.gpsfx.Main</mainClass>
-            <runfx.args>-jar "${project.build.directory}/${project.build.finalName}.jar"</runfx.args>
+            <exec.args>-classpath %classpath ${packageClassName}</exec.args>
+            <exec.executable>java</exec.executable>
+                
+            
+            
         </properties>
     </action>
     <action>
         <actionName>debug</actionName>
+        <packagings>
+            <packaging>jar</packaging>
+        </packagings>
         <goals>
-            <goal>clean</goal>
-            <goal>package</goal>
-            <goal>org.codehaus.mojo:exec-maven-plugin:1.6.0:java</goal>
+            <goal>process-classes</goal>
+            <goal>org.codehaus.mojo:exec-maven-plugin:3.0.0:exec</goal>
         </goals>
         <properties>
-            <mainClass>com.github.noony.app.gpsfx.Main</mainClass>
-            <runfx.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -Dglass.disableGrab=true -jar "${project.build.directory}/${project.build.finalName}.jar"</runfx.args>
+            <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath ${packageClassName}</exec.args>
+            <exec.executable>java</exec.executable>
             <jpda.listen>true</jpda.listen>
         </properties>
     </action>
@@ -34,12 +42,13 @@
         </packagings>
         <goals>
             <goal>process-classes</goal>
-            <goal>org.codehaus.mojo:exec-maven-plugin:1.6.0:exec</goal>
+            <goal>org.codehaus.mojo:exec-maven-plugin:3.0.0:exec</goal>
         </goals>
         <properties>
-            <mainClass>com.github.noony.app.gpsfx.Main</mainClass>
             <exec.args>-classpath %classpath ${packageClassName}</exec.args>
             <exec.executable>java</exec.executable>
         </properties>
-    </action>        
+    </action>
+    
+            
 </actions>
