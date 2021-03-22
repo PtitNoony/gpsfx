@@ -21,10 +21,6 @@ import com.github.noony.app.gpsfx.core.GpsFxProject;
 import com.github.noony.app.gpsfx.core.GpsFxProjectFactory;
 import com.github.noony.app.gpsfx.core.Person;
 import com.github.noony.app.gpsfx.core.PersonFactory;
-import com.github.noony.app.gpsfx.core.Place;
-import com.github.noony.app.gpsfx.core.PlaceFactory;
-import com.github.noony.app.gpsfx.core.PlaceLevel;
-import static com.github.noony.app.gpsfx.utils.XMLSaver.PICTURES_LOCATION_ATR;
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
@@ -66,33 +62,21 @@ public final class XMLLoader {
                 document = builder.parse(source);
                 Element e = document.getDocumentElement();
                 String projectName = e.getAttribute(XMLSaver.NAME_ATR);
-                // Configuration
-                NodeList configurationElements = e.getElementsByTagName(XMLSaver.CONFIGURATION_ELEMENT);
-                if (configurationElements.getLength() != 1) {
-                    LOG.log(Level.WARNING, "Wrong number of CONFIGURATION_ELEMENT ({1}):: configuration properties will NOT be loaded.", new Object[]{configurationElements.getLength()});
-                }
-                parseConfiguration((Element) configurationElements.item(0));
                 //
                 GpsFxObjectFactory.reset();
                 GpsFxProject project = GpsFxProjectFactory.createTimeline(projectName);
                 NodeList rootChildren = e.getChildNodes();
                 for (int i = 0; i < rootChildren.getLength(); i++) {
                     Node node = rootChildren.item(i);
-                    if (node instanceof Element) {
-                        Element element = (Element) node;
+                    if (node instanceof Element element) {
                         switch (element.getTagName()) {
-                            case XMLSaver.PLACES_GROUP:
-                                List<Place> places = parsePlaces(element, null);
-                                places.stream().filter(p -> p.getParent() == null).forEach(p -> project.addHighLevelPlace(p));
-                                break;
-                            case XMLSaver.PERSONS_GROUP:
+                            case XMLSaver.PERSONS_GROUP -> {
                                 List<Person> persons = parsePersons(element);
                                 persons.forEach(p -> project.addPerson(p));
-                                break;
-                            case XMLSaver.CONFIGURATION_ELEMENT:
-                                loadConfigurationAttributes(element);
-                                break;
-                            default:
+                            }
+                            case XMLSaver.ACTIVITY_ELEMENT ->
+                                System.err.println("TODO");
+                            default ->
                                 throw new UnsupportedOperationException("Unknown element :: " + element.getTagName());
                         }
                     }
@@ -104,46 +88,6 @@ public final class XMLLoader {
             }
         }
         return null;
-    }
-
-    private static void loadConfigurationAttributes(Element configurationElement) {
-        LOG.log(Level.FINE, "> Saving configuration.");
-        if (configurationElement.hasAttribute(PICTURES_LOCATION_ATR)) {
-            String picturesLocation = configurationElement.getAttribute(PICTURES_LOCATION_ATR);
-            LOG.log(Level.CONFIG, "Setting pictures location to : {0}", picturesLocation);
-        }
-    }
-
-    @Deprecated
-    private static void parseConfiguration(Element configurationElement) {
-//        String picturesLocation = configurationElement.getAttribute(XMLSaver.PICTURES_LOCATION_ATR);
-//        ProjectConfiguration.setPicturesLocation(picturesLocation);
-    }
-
-    private static List<Place> parsePlaces(Element placesRootElement, Place parentPlace) {
-        List<Place> places = new LinkedList<>();
-        NodeList placeElements = placesRootElement.getChildNodes();
-        for (int i = 0; i < placeElements.getLength(); i++) {
-            if (placeElements.item(i).getNodeName().equals(XMLSaver.PLACE_ELEMENT)) {
-                Element e = (Element) placeElements.item(i);
-                Place p = parsePlace(e, parentPlace);
-                places.add(p);
-            }
-        }
-        return places;
-    }
-
-    private static Place parsePlace(Element placeElement, Place parentPlace) {
-        // <place color="0xf5deb3ff" id="1" level="GALAXY" name="Galaxy">
-        Color color = Color.valueOf(placeElement.getAttribute(XMLSaver.COLOR_ATR));
-        long id = Long.parseLong(placeElement.getAttribute(XMLSaver.ID_ATR));
-        PlaceLevel level = PlaceLevel.valueOf(placeElement.getAttribute(XMLSaver.PLACE_LEVEL_ATR));
-        String name = placeElement.getAttribute(XMLSaver.NAME_ATR);
-//        System.err.println("creating place " + name);
-        Place place = PlaceFactory.createPlace(id, name, level, parentPlace, color);
-        List<Place> places = parsePlaces(placeElement, place);
-//        places.forEach(p -> place.addPlace(p));
-        return place;
     }
 
     private static List<Person> parsePersons(Element personsRootElement) {
