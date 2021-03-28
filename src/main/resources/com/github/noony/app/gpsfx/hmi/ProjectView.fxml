@@ -1,11 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.RadioMenuItem?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
 
 <BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.noony.app.gpsfx.hmi.ProjectViewController">
     <top>
@@ -41,4 +48,21 @@
     <center>
         <AnchorPane fx:id="mainAnchorPane" minHeight="100.0" minWidth="100.0" style="-fx-background-color: red;" BorderPane.alignment="CENTER" />
     </center>
+   <bottom>
+      <HBox spacing="8.0" BorderPane.alignment="CENTER">
+         <padding>
+            <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+         </padding>
+         <children>
+            <Button fx:id="reloadFromDiskB" disable="true" mnemonicParsing="false" onAction="#handleReloadFromDisk" text="Reload From disk">
+               <font>
+                  <Font size="10.0" />
+               </font>
+            </Button>
+            <Separator orientation="VERTICAL" />
+            <Label disable="true" maxHeight="1.7976931348623157E308" text="Label" />
+            <ProgressBar maxHeight="1.7976931348623157E308" progress="0.0" />
+         </children>
+      </HBox>
+   </bottom>
 </BorderPane>

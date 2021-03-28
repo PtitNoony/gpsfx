@@ -16,9 +16,12 @@
  */
 package com.github.noony.app.gpsfx.utils;
 
+import com.github.noony.app.gpsfx.core.GpsFxProject;
+import com.github.noony.app.gpsfx.core.Person;
 import com.github.noony.app.gpsfx.core.ProjectConfiguration;
 import java.io.File;
 import java.nio.file.Path;
+import java.util.List;
 
 /**
  *
@@ -49,5 +52,33 @@ public class FileUtils {
         } else {
             return relavivePath;
         }
+    }
+
+    public static boolean checkIfInSyncWithDisk(GpsFxProject aProject) {
+        aProject.setIsInSyncWithFolder(false);
+        return false;
+    }
+
+    public static void syncWithFolder(GpsFxProject aProject) {
+        // Updating persons activities
+        aProject.getPersons().forEach(person -> syncPerson(aProject, person));
+        aProject.setIsInSyncWithFolder(true);
+    }
+
+    private static void syncPerson(GpsFxProject aProject, Person aPerson) {
+        String rootFolder = aProject.getFolder();
+        System.err.println(" rootFolder :: " + rootFolder);
+        String activityFolder = rootFolder + File.separator + ProjectConfiguration.DEFAULT_ACTIVITIES_FOLDER + File.separator + aPerson.getName();
+        System.err.println(" > activititesFolder :: " + activityFolder);
+        getActivities(activityFolder).forEach(activity -> {
+        });
+    }
+
+    private static List<File> getActivities(String aFolder) {
+        File directory = new File(aFolder);
+        //get all the files from a directory
+        File[] fList = directory.listFiles();
+
+        return null;
     }
 }

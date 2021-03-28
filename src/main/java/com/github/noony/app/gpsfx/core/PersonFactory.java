@@ -16,8 +16,8 @@
  */
 package com.github.noony.app.gpsfx.core;
 
-import com.github.noony.app.gpsfx.core.Person;
-import com.github.noony.app.gpsfx.core.GpsFxObjectFactory;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -33,7 +33,12 @@ import javafx.scene.paint.Color;
  */
 public class PersonFactory {
 
+    public static final String PERSON_ADDED = "PersonFactory_personAdded";
+    public static final String PERSON_REMOVED = "PersonFactory_personRemoved";
+    public static final String PERSON_RESET = "PersonFactory_reset";
+
     private static final Map<Long, Person> PERSONS = new HashMap<>();
+    private static final PropertyChangeSupport PROPERTY_CHANGE_SUPPORT = new PropertyChangeSupport(PERSONS);
 
     private static final Logger LOG = Logger.getGlobal();
 
@@ -43,6 +48,7 @@ public class PersonFactory {
 
     public static final void reset() {
         PERSONS.clear();
+        PROPERTY_CHANGE_SUPPORT.firePropertyChange(PERSON_RESET, null, null);
     }
 
     public static final Person getPerson(long id) {
@@ -54,6 +60,7 @@ public class PersonFactory {
         var person = new Person(GpsFxObjectFactory.getNextID(), personName);
         PERSONS.put(person.getId(), person);
         GpsFxObjectFactory.addObject(person);
+        PROPERTY_CHANGE_SUPPORT.firePropertyChange(PERSON_ADDED, null, null);
         return person;
     }
 
@@ -62,6 +69,7 @@ public class PersonFactory {
         var person = new Person(GpsFxObjectFactory.getNextID(), personName, color);
         PERSONS.put(person.getId(), person);
         GpsFxObjectFactory.addObject(person);
+        PROPERTY_CHANGE_SUPPORT.firePropertyChange(PERSON_ADDED, null, null);
         return person;
     }
 
@@ -69,6 +77,7 @@ public class PersonFactory {
         LOG.log(Level.INFO, "Creating person with id={0} personName={1} color={2} pictureName={3}", new Object[]{id, personName, color, pictureName});
         var person = createPerson(id, personName, color);
         person.setPictureName(pictureName);
+        PROPERTY_CHANGE_SUPPORT.firePropertyChange(PERSON_ADDED, null, null);
         return person;
     }
 
@@ -80,11 +89,16 @@ public class PersonFactory {
         var person = new Person(id, personName, color);
         PERSONS.put(person.getId(), person);
         GpsFxObjectFactory.addObject(person);
+        PROPERTY_CHANGE_SUPPORT.firePropertyChange(PERSON_ADDED, null, null);
         return person;
     }
 
-    public static List< Person> getPERSONS() {
+    public static List<Person> getPERSONS() {
         return Collections.unmodifiableList(PERSONS.values().stream().collect(Collectors.toList()));
+    }
+
+    public static final void addListener(PropertyChangeListener listener) {
+        PROPERTY_CHANGE_SUPPORT.addPropertyChangeListener(listener);
     }
 
 }

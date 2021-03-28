@@ -16,7 +16,7 @@
  */
 package com.github.noony.app.gpsfx.core;
 
-import com.github.noony.app.gpsfx.core.GpsFxObjectFactory;
+import java.io.File;
 
 /**
  *
@@ -28,9 +28,9 @@ public class GpsFxProjectFactory {
         // private utility constructor
     }
 
-    public static final GpsFxProject createTimeline(String name) {
-        GpsFxProject timeLineProject = new GpsFxProject(name);
+    public static final GpsFxProject createProject(String name, File projectFile) {
+        var project = new GpsFxProject(name, projectFile);
         GpsFxObjectFactory.reset();
-        return timeLineProject;
+        return project;
     }
 }

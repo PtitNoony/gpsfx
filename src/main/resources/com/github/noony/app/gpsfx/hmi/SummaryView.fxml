@@ -7,10 +7,11 @@
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TreeView?>
+<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<SplitPane fx:id="splitPane" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.noony.app.gpsfx.hmi.SummaryViewController">
+<SplitPane fx:id="splitPane" dividerPositions="0.25" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.noony.app.gpsfx.hmi.SummaryViewController">
    <items>
       <VBox spacing="8.0">
          <children>
@@ -54,5 +55,6 @@
             <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
          </padding>
       </VBox>
+      <AnchorPane fx:id="mainPane" prefHeight="200.0" prefWidth="200.0" />
    </items>
 </SplitPane>

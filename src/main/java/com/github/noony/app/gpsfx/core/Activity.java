@@ -22,8 +22,15 @@ package com.github.noony.app.gpsfx.core;
  */
 public class Activity extends CustomObject {
 
-    public Activity(long anId) {
+    private final String name;
+
+    public Activity(long anId, String aName) {
         super(anId);
+        name = aName;
+    }
+
+    public String getName() {
+        return name;
     }
 
 }

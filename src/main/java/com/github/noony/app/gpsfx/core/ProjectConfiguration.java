@@ -40,14 +40,15 @@ public class ProjectConfiguration {
     public static final String USER_HOME = System.getProperty("user.home");
     public static final String DEFAULT_PORTRAITS_FOLDER = "portraits";
     public static final String DEFAULT_PICTURES_FOLDER = "pictures";
+    public static final String DEFAULT_ACTIVITIES_FOLDER = "activities";
 
     private static final String DEFAULT_PROJECTS_FOLDER = USER_HOME + File.separator + "Timelines";
     private static final Logger LOG = Logger.getGlobal();
 
-    private static String PROJECTS_FOLDER = DEFAULT_PROJECTS_FOLDER;
+    private static final String PROJECTS_FOLDER = DEFAULT_PROJECTS_FOLDER;
 
     private static File PROJECT_FOLDER = null;
-    private static File PROJECT_FILE = null;
+//    private static File PROJECT_FILE = null;
     private static File PORTRAITS_FOLDER = null;
     private static File PICTURES_FOLDER = null;
     private static File TIMELINE_FILE = null;
@@ -111,7 +112,9 @@ public class ProjectConfiguration {
         savePortraitRessources();
         PROPERTY_CHANGE_SUPPORT.firePropertyChange(PICTURES_LOCATION_CHANGED, null, PROJECT_LOCATION);
         //
-        return GpsFxProjectFactory.createTimeline(projectName);
+        File saveFile = new File(PROJECT_LOCATION + File.separator + projectName + ".xml");
+        //
+        return GpsFxProjectFactory.createProject(projectName, saveFile);
     }
 
     public static GpsFxProject loadProject(File aFile) {

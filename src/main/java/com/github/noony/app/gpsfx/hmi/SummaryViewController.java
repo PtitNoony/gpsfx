@@ -27,6 +27,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import static javafx.application.Platform.runLater;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -82,7 +83,7 @@ public final class SummaryViewController implements Initializable {
     private PersonCreationViewController personCreationController = null;
     private EditType editType;
     //
-    private final PropertyChangeListener timelineChangeListener = e -> handleTimelineChanges(e);
+    private final PropertyChangeListener projectChangeListener = e -> handleProjectChanges(e);
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -110,6 +111,9 @@ public final class SummaryViewController implements Initializable {
             }
         });
         mainTabPane.getSelectionModel().select(placeTab);
+        //
+//        PersonFactory.addListener(this::handlePersonFactoryEvents);
+//        PlaceFactory.addListener(this::handlePlacesFactoryEvents);
         setEditMode(EditType.PLACE);
     }
 
@@ -156,10 +160,10 @@ public final class SummaryViewController implements Initializable {
 
     protected void setProject(GpsFxProject aProjectFactory) {
         if (project != null) {
-            project.removeListener(timelineChangeListener);
+            project.removeListener(projectChangeListener);
         }
         project = aProjectFactory;
-        project.addListener(timelineChangeListener);
+        project.addListener(projectChangeListener);
         //
         updatePersonTab();
         updatePlacesTab();
@@ -324,17 +328,20 @@ public final class SummaryViewController implements Initializable {
         }
     }
 
-    private void handleTimelineChanges(PropertyChangeEvent event) {
+    private void handleProjectChanges(PropertyChangeEvent event) {
         switch (event.getPropertyName()) {
-//            case TimeLineProject.PLACE_REMOVED:
-//            case TimeLineProject.PLACE_ADDED:
-//                runLater(this::updatePlacesTab);
-//                break;
-//            case TimeLineProject.PERSON_ADDED:
-//            case TimeLineProject.PERSON_REMOVED:
-//                runLater(this::updatePersonTab);
-//                break;
-
+            case GpsFxProject.HIGH_LEVEL_PLACE_ADDED:
+            case GpsFxProject.PLACE_REMOVED:
+            case GpsFxProject.PLACE_ADDED:
+                runLater(this::updatePlacesTab);
+                break;
+            case GpsFxProject.PERSON_ADDED:
+            case GpsFxProject.PERSON_REMOVED:
+                runLater(this::updatePersonTab);
+                break;
+            case GpsFxProject.IS_IN_SYNC_CHANGED:
+                // ignore
+                break;
             default:
                 throw new UnsupportedOperationException(this.getClass().getSimpleName() + " :: " + event);
         }
@@ -361,4 +368,11 @@ public final class SummaryViewController implements Initializable {
         }
     }
 
+    private void handlePersonFactoryEvents(PropertyChangeEvent event) {
+        updatePersonTab();
+    }
+
+    private void handlePlacesFactoryEvents(PropertyChangeEvent event) {
+        updatePlacesTab();
+    }
 }

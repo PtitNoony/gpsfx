@@ -64,23 +64,27 @@ public final class XMLLoader {
                 String projectName = e.getAttribute(XMLSaver.NAME_ATR);
                 //
                 GpsFxObjectFactory.reset();
-                GpsFxProject project = GpsFxProjectFactory.createTimeline(projectName);
+                GpsFxProject project = GpsFxProjectFactory.createProject(projectName, file);
                 NodeList rootChildren = e.getChildNodes();
                 for (int i = 0; i < rootChildren.getLength(); i++) {
                     Node node = rootChildren.item(i);
-                    if (node instanceof Element element) {
+                    if (node instanceof Element) {
+                        Element element = (Element) node;
                         switch (element.getTagName()) {
                             case XMLSaver.PERSONS_GROUP -> {
                                 List<Person> persons = parsePersons(element);
                                 persons.forEach(p -> project.addPerson(p));
                             }
-                            case XMLSaver.ACTIVITY_ELEMENT ->
+                            case XMLSaver.ACTIVITIES_GROUP ->
                                 System.err.println("TODO");
                             default ->
                                 throw new UnsupportedOperationException("Unknown element :: " + element.getTagName());
                         }
                     }
                 }
+                //
+                FileUtils.checkIfInSyncWithDisk(project);
+                //
                 return project;
                 //
             } catch (IOException | SAXException | ParserConfigurationException ex) {

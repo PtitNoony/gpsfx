@@ -16,9 +16,8 @@
  */
 package com.github.noony.app.gpsfx.core;
 
-import com.github.noony.app.gpsfx.core.Place;
-import com.github.noony.app.gpsfx.core.PlaceLevel;
-import com.github.noony.app.gpsfx.core.GpsFxObjectFactory;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,9 +34,14 @@ public class PlaceFactory {
 
     public static final Place PLACES_PLACE = new Place(-1, "PLACES", PlaceLevel.UNIVERSE, null);
 
+    public static final String PLACE_ADDED = "PlaceFactory_placeAdded";
+    public static final String PLACE_REMOVED = "PlaceFactory_placeRemoved";
+    public static final String PLACES_RESET = "PlaceFactory_reset";
+
     private static final Logger LOG = Logger.getGlobal();
 
     private static final Map<Long, Place> PLACES = new HashMap<>();
+    private static final PropertyChangeSupport PROPERTY_CHANGE_SUPPORT = new PropertyChangeSupport(PLACES);
 
     private PlaceFactory() {
         // private utility constructor
@@ -45,6 +49,7 @@ public class PlaceFactory {
 
     public static final void reset() {
         PLACES.clear();
+        PROPERTY_CHANGE_SUPPORT.firePropertyChange(PLACES_RESET, null, null);
     }
 
     public static List<Place> getPlaces() {
@@ -61,6 +66,7 @@ public class PlaceFactory {
         var place = new Place(GpsFxObjectFactory.getNextID(), placeName, placeLevel, trueParentPlace);
         PLACES.put(place.getId(), place);
         GpsFxObjectFactory.addObject(place);
+        PROPERTY_CHANGE_SUPPORT.firePropertyChange(PLACE_ADDED, null, place);
         return place;
     }
 
@@ -70,6 +76,7 @@ public class PlaceFactory {
         var place = new Place(GpsFxObjectFactory.getNextID(), placeName, placeLevel, trueParentPlace, color);
         PLACES.put(place.getId(), place);
         GpsFxObjectFactory.addObject(place);
+        PROPERTY_CHANGE_SUPPORT.firePropertyChange(PLACE_ADDED, null, place);
         return place;
     }
 
@@ -82,6 +89,11 @@ public class PlaceFactory {
         var place = new Place(id, placeName, placeLevel, trueParentPlace, color);
         PLACES.put(place.getId(), place);
         GpsFxObjectFactory.addObject(place);
+        PROPERTY_CHANGE_SUPPORT.firePropertyChange(PLACE_ADDED, null, place);
         return place;
+    }
+
+    public static final void addListener(PropertyChangeListener listener) {
+        PROPERTY_CHANGE_SUPPORT.addPropertyChangeListener(listener);
     }
 }

@@ -18,6 +18,7 @@ package com.github.noony.app.gpsfx.hmi;
 
 import com.github.noony.app.gpsfx.core.GpsFxProject;
 import com.github.noony.app.gpsfx.core.ProjectConfiguration;
+import com.github.noony.app.gpsfx.utils.FileUtils;
 import com.github.noony.app.gpsfx.utils.XMLSaver;
 import java.beans.PropertyChangeEvent;
 import java.io.IOException;
@@ -33,6 +34,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.Toggle;
@@ -58,13 +60,11 @@ public final class ProjectViewController implements Initializable {
 
     @FXML
     private MenuBar menuBar;
+    @FXML
+    private Button reloadFromDiskB;
 
     @FXML
     private RadioMenuItem summaryViewMI;
-//    @FXML
-//    private RadioMenuItem timelineViewMI;
-//    @FXML
-//    private RadioMenuItem galleryViewMI;
 
     private GpsFxProject project;
     private FileChooser fileChooser;
@@ -76,7 +76,7 @@ public final class ProjectViewController implements Initializable {
     private Parent projectCreationWizardView = null;
 //    private Parent pictureLoaderView = null;
     //
-    private SummaryViewController contentController = null;
+    private SummaryViewController summaryViewController = null;
 //    private TimelineViewController timelineController = null;
 //    private GalleryViewController galleryController = null;
 //    private ConfigurationViewController configurationController = null;
@@ -94,27 +94,18 @@ public final class ProjectViewController implements Initializable {
         fileChooser = new FileChooser();
         //
         loadSummaryView();
-//        loadTimelineView();
         //
         viewToggleGroup = new ToggleGroup();
         summaryViewMI.setToggleGroup(viewToggleGroup);
-//        timelineViewMI.setToggleGroup(viewToggleGroup);
-//        galleryViewMI.setToggleGroup(viewToggleGroup);
         //
         viewToggleGroup.selectedToggleProperty().addListener((ObservableValue<? extends Toggle> ov, Toggle t, Toggle t1) -> {
             if (t1 == summaryView) {
                 displaySummaryView();
             }
-//            else if (t1 == timelineViewMI) {
-//                displayTimelineView();
-//            } else if (t1 == galleryViewMI) {
-//                displayGalleryView();
-//            }
         });
         //
         summaryViewMI.setSelected(true);
         summaryView.setDisable(true);
-//        timelineView.setDisable(true);
         displaySummaryView();
     }
 
@@ -165,17 +156,29 @@ public final class ProjectViewController implements Initializable {
         }
     }
 
-    public void loadProject(GpsFxProject aTimeLineProject) {
-        System.err.println(" >> ICI :: loadProject ");
-        project = aTimeLineProject;
+    @FXML
+    protected void handleReloadFromDisk(ActionEvent event) {
+        FileUtils.syncWithFolder(project);
+    }
+
+    public void loadProject(GpsFxProject aProject) {
+        LOG.log(Level.INFO, "Loading Project {0}", aProject);
+        if (project != null) {
+            project.removeListener(this::handleProjectChanges);
+        }
+        project = aProject;
         if (project == null) {
-            System.err.println(" >> ICI :: loadProject project NULL");
+            LOG.log(Level.INFO, "> COuld NOT load project since it is NULL");
             summaryView.setDisable(true);
-//            timelineView.setDisable(true);
         } else {
+            project.addListener(this::handleProjectChanges);
             summaryView.setDisable(false);
-            System.err.println(" >> ICI :: loadProject project not null");
-//            timelineView.setDisable(false);
+            summaryViewController.setProject(project);
+            if (!project.isInSyncWithFolder()) {
+                reloadFromDiskB.setDisable(false);
+            } else {
+                reloadFromDiskB.setDisable(true);
+            }
         }
     }
 
@@ -239,7 +242,7 @@ public final class ProjectViewController implements Initializable {
             LOG.log(Level.SEVERE, "Could not load SummayView ::  {0}", new Object[]{ex});
         }
         System.err.println(" ICI loadSummaryView !!!");
-        contentController = loader.getController();
+        summaryViewController = loader.getController();
 //        contentController.addPropertyChangeListener(this::handleConfigurationControllerChanges);
     }
 
@@ -283,7 +286,25 @@ public final class ProjectViewController implements Initializable {
         saveWindow.showSaveAndContinue(project);
     }
 
+    private void handleProjectChanges(PropertyChangeEvent event) {
+        switch (event.getPropertyName()) {
+            case GpsFxProject.IS_IN_SYNC_CHANGED:
+                reloadFromDiskB.setDisable(!project.isInSyncWithFolder());
+                break;
+            case GpsFxProject.HIGH_LEVEL_PLACE_ADDED:
+            case GpsFxProject.PERSON_ADDED:
+            case GpsFxProject.PERSON_REMOVED:
+            case GpsFxProject.PLACE_ADDED:
+            case GpsFxProject.PLACE_REMOVED:
+                // ignore
+                break;
+            default:
+                throw new UnsupportedOperationException("" + event);
+        }
+    }
+
     private void handleConfigurationControllerChanges(PropertyChangeEvent event) {
+
         switch (event.getPropertyName()) {
 //            case ConfigurationViewController.CLOSE_REQUESTED:
 //                hideModalStage();

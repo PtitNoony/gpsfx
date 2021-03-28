@@ -18,6 +18,7 @@ package com.github.noony.app.gpsfx.core;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -36,22 +37,30 @@ public class GpsFxProject {
     public static final String HIGH_LEVEL_PLACE_ADDED = "highLevellaceAdded";
     public static final String PERSON_REMOVED = "personRemoved";
     public static final String PLACE_REMOVED = "placeRemoved";
+    public static final String IS_IN_SYNC_CHANGED = "isInSyncChanged";
 
     private final PropertyChangeSupport propertyChangeSupport;
 
     private final String name;
+    private final File projectFile;
 
     private final List<Place> hightLevelPlaces;
     private final Map<String, Place> allPlaces;
+    private final Map<Place, Activity> allActivities;
 
     private final List<Person> persons;
 
-    protected GpsFxProject(String projectName) {
+    private boolean isInSyncWithFolder;
+
+    protected GpsFxProject(String aProjectName, File aProjectFile) {
         propertyChangeSupport = new PropertyChangeSupport(GpsFxProject.this);
-        name = projectName;
+        name = aProjectName;
+        projectFile = aProjectFile;
         hightLevelPlaces = new LinkedList<>();
         allPlaces = new HashMap<>();
+        allActivities = new HashMap<>();
         persons = new LinkedList<>();
+        isInSyncWithFolder = true;
     }
 
     public void addListener(PropertyChangeListener listener) {
@@ -96,6 +105,19 @@ public class GpsFxProject {
         return Collections.unmodifiableList(persons);
     }
 
+    public void setIsInSyncWithFolder(boolean isInSyncWithFolder) {
+        this.isInSyncWithFolder = isInSyncWithFolder;
+        propertyChangeSupport.firePropertyChange(IS_IN_SYNC_CHANGED, null, this.isInSyncWithFolder);
+    }
+
+    public boolean isInSyncWithFolder() {
+        return isInSyncWithFolder;
+    }
+
+    public String getFolder() {
+        return projectFile.getParent();
+    }
+
     /**
      * NOTE: this method may take time with larger projects.
      *
@@ -103,6 +125,15 @@ public class GpsFxProject {
      */
     public List<Place> getAllPlaces() {
         return allPlaces.values().stream().collect(Collectors.toList());
+    }
+
+    /**
+     * NOTE: this method may take time with larger projects.
+     *
+     * @return all the activities present in the project.
+     */
+    public List<Activity> getAllActivities() {
+        return allActivities.values().stream().collect(Collectors.toList());
     }
 
     public boolean addPerson(Person aPerson) {
