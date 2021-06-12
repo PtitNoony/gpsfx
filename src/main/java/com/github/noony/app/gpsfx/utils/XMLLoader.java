@@ -68,8 +68,7 @@ public final class XMLLoader {
                 NodeList rootChildren = e.getChildNodes();
                 for (int i = 0; i < rootChildren.getLength(); i++) {
                     Node node = rootChildren.item(i);
-                    if (node instanceof Element) {
-                        Element element = (Element) node;
+                    if (node instanceof Element element) {
                         switch (element.getTagName()) {
                             case XMLSaver.PERSONS_GROUP -> {
                                 List<Person> persons = parsePersons(element);

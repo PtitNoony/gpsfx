@@ -20,20 +20,34 @@ package com.github.noony.app.gpsfx.core;
  *
  * @author hamon
  */
-public class Activity extends CustomObject {
+public class GpsPoint {
 
-    private final String name;
+    private double longitude;
+    private double latitude;
+    private double elevation;
+    private double tanLatitude;
 
-    public Activity(long anId, String aName) {
-        super(anId);
-        name = aName;
+    public GpsPoint(double alongitude, double aLatitude, double anElevation) {
+        longitude = alongitude;
+        latitude = aLatitude;
+        elevation = anElevation;
+        tanLatitude = Math.tan((latitude - 5) / 180 * Math.PI) * 45;
     }
 
-    public String getName() {
-        return name;
+    public double getElevation() {
+        return elevation;
     }
 
-    private void loadActivityFile() {
-
+    public double getLatitude() {
+        return latitude;
     }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public double getTanLatitude() {
+        return tanLatitude;
+    }
+
 }

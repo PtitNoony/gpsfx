@@ -184,18 +184,18 @@ public final class ProjectViewController implements Initializable {
 
     private void executeActionOnHold() {
         switch (actionOnHold) {
-            case NEW_PROJECT:
+            case NEW_PROJECT -> {
                 if (projectCreationWizardView == null) {
                     loadProjectCreationWizardView();
                 }
                 showModalStage(projectCreationWizardView);
-                break;
-            case NONE:
-                // nothing to do
-                break;
-            default:
+            }
+            case NONE -> {
+            }
+            default ->
                 throw new UnsupportedOperationException("Unsupported action type :: " + actionOnHold);
         }
+        // nothing to do
         actionOnHold = ACTION_ON_HOLD.NONE;
     }
 
@@ -316,36 +316,36 @@ public final class ProjectViewController implements Initializable {
 
     private void handleProjectCreationControllerChanges(PropertyChangeEvent event) {
         switch (event.getPropertyName()) {
-            case ProjectCreationWizardController.CANCEL:
+            case ProjectCreationWizardController.CANCEL -> {
+                LOG.log(Level.INFO, "Project creation canceled");
                 hideModalStage();
-                break;
-            case ProjectCreationWizardController.CREATE:
+            }
+            case ProjectCreationWizardController.CREATE -> {
                 hideModalStage();
                 String projectName = (String) event.getNewValue();
+                LOG.log(Level.INFO, "Creating project :: {0}", new Object[]{projectName});
                 GpsFxProject project = ProjectConfiguration.createProject(projectName);
                 loadProject(project);
                 summaryView.setDisable(false);
 //                timelineView.setDisable(false);
                 displaySummaryView();
-                break;
-            default:
+            }
+            default ->
                 throw new UnsupportedOperationException("" + event);
         }
     }
 
     private void handleSaveWindowEvents(PropertyChangeEvent event) {
         switch (event.getPropertyName()) {
-            case SaveWindow.CANCEL:
+            case SaveWindow.CANCEL ->
                 actionOnHold = ACTION_ON_HOLD.NONE;
-                break;
-            case SaveWindow.SAVE:
+            case SaveWindow.SAVE -> {
                 handleProjectSave(new ActionEvent());
                 executeActionOnHold();
-                break;
-            case SaveWindow.DISCARD:
+            }
+            case SaveWindow.DISCARD ->
                 executeActionOnHold();
-                break;
-            default:
+            default ->
                 throw new UnsupportedOperationException("" + event);
         }
     }
