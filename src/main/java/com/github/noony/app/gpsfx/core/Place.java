@@ -16,8 +16,6 @@
  */
 package com.github.noony.app.gpsfx.core;
 
-import com.github.noony.app.gpsfx.core.PlaceLevel;
-import com.github.noony.app.gpsfx.core.CustomObject;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.Collections;

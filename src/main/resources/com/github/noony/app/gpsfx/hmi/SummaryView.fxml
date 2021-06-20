@@ -2,64 +2,104 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.Tab?>
-<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TreeView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<SplitPane fx:id="splitPane" dividerPositions="0.5071090047393365" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.noony.app.gpsfx.hmi.SummaryViewController">
+<SplitPane fx:id="splitPane" dividerPositions="0.29022988505747127, 0.6077586206896551" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.noony.app.gpsfx.hmi.SummaryViewController">
    <items>
-      <VBox spacing="8.0">
+      <AnchorPane style="-fx-background-color: red;">
          <children>
-            <TabPane fx:id="mainTabPane" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="SOMETIMES">
-              <tabs>
-                  <Tab text="Activities">
-                    <content>
-                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                    </content>
-                  </Tab>
-                <Tab fx:id="placeTab" text="Places">
-                  <content>
-                        <VBox spacing="8.0">
-                           <children>
-                              <TreeView fx:id="placesCheckTreeView" VBox.vgrow="SOMETIMES" />
-                           </children>
-                           <padding>
-                              <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
-                           </padding>
-                        </VBox>
-                  </content>
-                </Tab>
-                <Tab fx:id="personTab" text="Persons">
-                  <content>
-                        <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="200.0" prefWidth="100.0" spacing="8.0">
-                           <children>
-                              <ListView fx:id="personCheckListView" maxWidth="1.7976931348623157E308" VBox.vgrow="SOMETIMES" />
-                           </children>
-                           <padding>
-                              <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
-                           </padding>
-                        </VBox>
-                  </content>
-                </Tab>
-              </tabs>
-            </TabPane>
-            <HBox spacing="8.0" VBox.vgrow="NEVER">
-               <children>
-                  <Button fx:id="deleteButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleDelete" text="Delete" HBox.hgrow="SOMETIMES" />
-                  <Button fx:id="editButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleEdit" text="Edit" HBox.hgrow="SOMETIMES" />
-                  <Button fx:id="createButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleCreate" text="Create" HBox.hgrow="SOMETIMES" />
-               </children>
-            </HBox>
+            <SplitPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <items>
+                  <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="8.0">
+                     <children>
+                        <SplitPane dividerPositions="0.5" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" orientation="VERTICAL" VBox.vgrow="SOMETIMES">
+                           <items>
+                              <VBox spacing="8.0">
+                                 <children>
+                                    <Label text="Places">
+                                       <font>
+                                          <Font name="System Bold" size="14.0" />
+                                       </font>
+                                    </Label>
+                                    <TreeView fx:id="placesCheckTreeView" VBox.vgrow="SOMETIMES" />
+                                    <HBox spacing="8.0" VBox.vgrow="NEVER">
+                                       <children>
+                                          <Button fx:id="deletePlaceButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleDeletePlace" text="Delete" HBox.hgrow="SOMETIMES" />
+                                          <Button fx:id="editPlaceButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleEditPlace" text="Edit" HBox.hgrow="SOMETIMES" />
+                                          <Button fx:id="createPlaceButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleCreatePlace" text="Create" HBox.hgrow="SOMETIMES" />
+                                       </children>
+                                    </HBox>
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                                 </padding>
+                              </VBox>
+                              <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="200.0" prefWidth="100.0" spacing="8.0">
+                                 <children>
+                                    <Label text="Persons" VBox.vgrow="NEVER">
+                                       <font>
+                                          <Font name="System Bold" size="14.0" />
+                                       </font>
+                                    </Label>
+                                    <ListView fx:id="personCheckListView" maxWidth="1.7976931348623157E308" VBox.vgrow="SOMETIMES" />
+                                    <HBox spacing="8.0">
+                                       <children>
+                                          <Button fx:id="deletePersonButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleDeletePerson" text="Delete" HBox.hgrow="SOMETIMES" />
+                                          <Button fx:id="editPersonButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleEditPerson" text="Edit" HBox.hgrow="SOMETIMES" />
+                                          <Button fx:id="createPersonButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleCreatePerson" text="Create" HBox.hgrow="SOMETIMES" />
+                                       </children>
+                                    </HBox>
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                                 </padding>
+                              </VBox>
+                           </items>
+                        </SplitPane>
+                     </children>
+                     <padding>
+                        <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                     </padding>
+                  </VBox>
+               </items>
+            </SplitPane>
          </children>
-         <padding>
-            <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
-         </padding>
-      </VBox>
+      </AnchorPane>
+    <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0">
+         <children>
+            <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="8.0" AnchorPane.bottomAnchor="8.0" AnchorPane.leftAnchor="8.0" AnchorPane.rightAnchor="8.0" AnchorPane.topAnchor="8.0">
+               <children>
+                  <Label text="Activities" VBox.vgrow="NEVER">
+                     <font>
+                        <Font name="System Bold" size="14.0" />
+                     </font>
+                  </Label>
+                  <TableView maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="SOMETIMES">
+                    <columns>
+                      <TableColumn prefWidth="75.0" text="C1" />
+                      <TableColumn prefWidth="75.0" text="C2" />
+                    </columns>
+                  </TableView>
+                  <HBox alignment="CENTER" maxWidth="1.7976931348623157E308" spacing="8.0" VBox.vgrow="NEVER">
+                     <children>
+                        <Button fx:id="deleteActivityButton" mnemonicParsing="false" onAction="#handleDeleteActivity" text="Delete" />
+                        <Button fx:id="editActivityButton" mnemonicParsing="false" onAction="#handleEditActivity" text="Edit" />
+                        <Button fx:id="importActivityButton" mnemonicParsing="false" onAction="#handleImportActivities" text="Import" />
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+         </children>
+      </AnchorPane>
       <AnchorPane fx:id="mainPane" prefHeight="200.0" prefWidth="200.0" />
    </items>
 </SplitPane>

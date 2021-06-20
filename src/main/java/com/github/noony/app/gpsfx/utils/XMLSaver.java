@@ -19,6 +19,7 @@ package com.github.noony.app.gpsfx.utils;
 import com.github.noony.app.gpsfx.core.Activity;
 import com.github.noony.app.gpsfx.core.GpsFxProject;
 import com.github.noony.app.gpsfx.core.Person;
+import com.github.noony.app.gpsfx.core.Place;
 import java.io.File;
 import java.time.format.DateTimeFormatter;
 import java.util.logging.Level;
@@ -42,6 +43,7 @@ import org.w3c.dom.Element;
 public class XMLSaver {
 
     public static final String PROJECT_GROUP = "PROJECT";
+    public static final String PLACES_GROUP = "PLACES";
     public static final String PERSONS_GROUP = "PERSONS";
     public static final String ACTIVITIES_GROUP = "ACTIVITIES";
     //
@@ -94,6 +96,14 @@ public class XMLSaver {
             Element personsGroupElement = doc.createElement(PERSONS_GROUP);
             rootElement.appendChild(personsGroupElement);
             project.getPersons().forEach(person -> personsGroupElement.appendChild(createPersonElement(doc, person)));
+            // save places
+            Element placesGroupElement = doc.createElement(PLACES_GROUP);
+            rootElement.appendChild(placesGroupElement);
+            project.getHightLevelPlaces().forEach(place -> placesGroupElement.appendChild(createPlaceElement(doc, place, "root")));
+            // save activities
+            Element activitiesGroupElement = doc.createElement(ACTIVITIES_GROUP);
+            rootElement.appendChild(activitiesGroupElement);
+            project.getAllActivities().forEach(activity -> activitiesGroupElement.appendChild(createActivityElement(doc, activity)));
             //
             rootElement.normalize();
             // write the content into xml file
@@ -118,6 +128,17 @@ public class XMLSaver {
         personElement.setAttribute(NAME_ATR, person.getName());
         personElement.setAttribute(COLOR_ATR, person.getColor().toString());
         return personElement;
+    }
+
+    private static Element createPlaceElement(Document doc, Place place, String fromPlace) {
+        LOG.log(Level.FINE, "> Creating place {0} from {1}", new Object[]{place.getName(), fromPlace});
+        Element placeElement = doc.createElement(PLACE_ELEMENT);
+        placeElement.setAttribute(ID_ATR, Long.toString(place.getId()));
+        placeElement.setAttribute(NAME_ATR, place.getName());
+        placeElement.setAttribute(PLACE_LEVEL_ATR, place.getLevel().name());
+        placeElement.setAttribute(COLOR_ATR, place.getColor().toString());
+        place.getPlaces().forEach(p -> placeElement.appendChild(createPlaceElement(doc, p, place.getName())));
+        return placeElement;
     }
 
     private static Element createActivityElement(Document doc, Activity activity) {

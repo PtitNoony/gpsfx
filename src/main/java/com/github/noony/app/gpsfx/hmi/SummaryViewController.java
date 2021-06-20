@@ -38,8 +38,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SplitPane;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.stage.Stage;
@@ -57,17 +55,15 @@ public final class SummaryViewController implements Initializable {
     }
 
     @FXML
-    private TabPane mainTabPane;
-
-    @FXML
-    private Tab placeTab, personTab;
-
-    @FXML
     private TreeView<Place> placesCheckTreeView;
     @FXML
     private ListView<Person> personCheckListView;
     @FXML
-    private Button createButton, editButton, deleteButton;
+    private Button createPlaceButton, editPlaceButton, deletePlaceButton;
+    @FXML
+    private Button createPersonButton, editPersonButton, deletePersonButton;
+    @FXML
+    private Button importActivityButton, editActivityButton, deleteActivityButton;
 
     @FXML
     private SplitPane splitPane;
@@ -79,83 +75,89 @@ public final class SummaryViewController implements Initializable {
     //
     private Parent placeCreationView = null;
     private Parent personCreationView = null;
+    private Parent activitiesImportView = null;
     private PlaceCreationViewController placeCreationController = null;
     private PersonCreationViewController personCreationController = null;
-    private EditType editType;
+    private ActivitiesImportViewController activitiesImportController = null;
     //
     private final PropertyChangeListener projectChangeListener = e -> handleProjectChanges(e);
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // init
-        //
-        createButton.setDisable(false);
-        editButton.setDisable(true);
-        deleteButton.setDisable(true);
-        placesCheckTreeView.getSelectionModel().selectedItemProperty().addListener((ObservableValue<? extends TreeItem<Place>> ov, TreeItem<Place> t, TreeItem<Place> t1) -> {
-            editButton.setDisable(t1 == null);
-            deleteButton.setDisable(t1 == null);
-        });
-        //
-        personCheckListView.getSelectionModel().selectedItemProperty().addListener((ObservableValue<? extends Person> ov, Person t, Person t1) -> {
-            editButton.setDisable(t1 == null);
-            deleteButton.setDisable(t1 == null);
-        });
-        mainTabPane.getSelectionModel().selectedItemProperty().addListener((ObservableValue<? extends Tab> ov, Tab t, Tab t1) -> {
-            if (t1 == placeTab) {
-                setEditMode(EditType.PLACE);
-            } else if (t1 == personTab) {
-                setEditMode(EditType.PERSON);
-            } else {
-                setEditMode(EditType.NONE);
-            }
-        });
-        mainTabPane.getSelectionModel().select(placeTab);
+        initPlaces();
+        initPersons();
+        initActivities();
         //
 //        PersonFactory.addListener(this::handlePersonFactoryEvents);
 //        PlaceFactory.addListener(this::handlePlacesFactoryEvents);
-        setEditMode(EditType.PLACE);
     }
 
     @FXML
-    protected void handleCreate(ActionEvent event) {
-        LOG.log(Level.INFO, "handleCreate {0}", event);
-        switch (editType) {
-            case PERSON ->
-                createNewPerson();
-            case PLACE ->
-                createNewPlace();
-            default ->
-                throw new IllegalStateException("Creation forbidden for edition type : " + editType);
+    protected void handleCreatePlace(ActionEvent event) {
+        LOG.log(Level.INFO, "handleCreatePlace {0}", event);
+        if (project != null) {
+            createNewPlace();
         }
     }
 
     @FXML
-    protected void handleEdit(ActionEvent event) {
+    protected void handleCreatePerson(ActionEvent event) {
+        LOG.log(Level.INFO, "handleCreatePerson {0}", event);
+        if (project != null) {
+            createNewPerson();
+        }
+    }
+
+    @FXML
+    protected void handleEditPlace(ActionEvent event) {
+        LOG.log(Level.INFO, "handleEditPlace {0}", event);
+        if (project != null) {
+            editPlace();
+        }
+    }
+
+    @FXML
+    protected void handleEditPerson(ActionEvent event) {
         LOG.log(Level.INFO, "handleEdit {0}", event);
-        switch (editType) {
-            case PERSON ->
-                editPerson();
-            case PLACE ->
-                editPlace();
-            default ->
-                throw new IllegalStateException("Edition forbidden for edition type : " + editType);
+        if (project != null) {
+            editPerson();
         }
     }
 
     @FXML
-    protected void handleDelete(ActionEvent event) {
+    protected void handleDeletePlace(ActionEvent event) {
         LOG.log(Level.INFO, "handleDeletePlace {0}", event);
         if (project != null) {
-            switch (editType) {
-                case PERSON ->
-                    removePerson();
-                case PLACE ->
-                    removePlace();
-                default ->
-                    throw new IllegalStateException("Edition forbidden for edition type : " + editType);
-            }
+            removePlace();
         }
+    }
+
+    @FXML
+    protected void handleDeletePerson(ActionEvent event) {
+        LOG.log(Level.INFO, "handleDeletePlace {0}", event);
+        if (project != null) {
+            removePerson();
+        }
+    }
+
+    @FXML
+    protected void handleImportActivities(ActionEvent event) {
+        LOG.log(Level.INFO, "handleImportActivities {0}", event);
+        if (project != null) {
+            importActivities();
+        }
+
+    }
+
+    @FXML
+    protected void handleEditActivity(ActionEvent event) {
+
+    }
+
+    @FXML
+    protected void handleDeleteActivity(ActionEvent event) {
+
     }
 
     protected void setProject(GpsFxProject aProjectFactory) {
@@ -165,9 +167,41 @@ public final class SummaryViewController implements Initializable {
         project = aProjectFactory;
         project.addListener(projectChangeListener);
         //
-        updatePersonTab();
-        updatePlacesTab();
-        // Todo remove old tabs
+        updatePersons();
+        updatePlaces();
+    }
+
+    private void initPlaces() {
+        createPlaceButton.setDisable(false);
+        editPlaceButton.setDisable(true);
+        deletePlaceButton.setDisable(true);
+        //
+        placesCheckTreeView.getSelectionModel().selectedItemProperty().addListener((ObservableValue<? extends TreeItem<Place>> ov, TreeItem<Place> t, TreeItem<Place> t1) -> {
+            editPlaceButton.setDisable(t1 == null);
+            deletePlaceButton.setDisable(t1 == null);
+        });
+    }
+
+    private void initPersons() {
+        createPersonButton.setDisable(false);
+        editPersonButton.setDisable(true);
+        deletePersonButton.setDisable(true);
+        //
+        personCheckListView.getSelectionModel().selectedItemProperty().addListener((ObservableValue<? extends Person> ov, Person t, Person t1) -> {
+            editPersonButton.setDisable(t1 == null);
+            deletePersonButton.setDisable(t1 == null);
+        });
+    }
+
+    private void initActivities() {
+        importActivityButton.setDisable(false);
+        editActivityButton.setDisable(true);
+        deleteActivityButton.setDisable(true);
+        //
+//        personCheckListView.getSelectionModel().selectedItemProperty().addListener((ObservableValue<? extends Person> ov, Person t, Person t1) -> {
+//            editPersonButton.setDisable(t1 == null);
+//            deletePersonButton.setDisable(t1 == null);
+//        });
     }
 
     private void showModalStage(Parent content) {
@@ -182,11 +216,11 @@ public final class SummaryViewController implements Initializable {
         modalStage.show();
     }
 
-    private void updatePersonTab() {
+    private void updatePersons() {
         personCheckListView.getItems().setAll(project.getPersons());
     }
 
-    private void updatePlacesTab() {
+    private void updatePlaces() {
         var rootPlaceItem = createRootPlaceItem();
         project.getHightLevelPlaces().forEach(p -> rootPlaceItem.getChildren().add(createTreeItemPlace(p)));
         placesCheckTreeView.setRoot(rootPlaceItem);
@@ -207,18 +241,6 @@ public final class SummaryViewController implements Initializable {
         return placeItem;
     }
 
-    private void setEditMode(EditType mode) {
-        editType = mode;
-        switch (editType) {
-            case PERSON, PLACE ->
-                createButton.setDisable(false);
-            case NONE ->
-                createButton.setDisable(true);
-            default ->
-                throw new IllegalStateException("Illegal edition type : " + editType);
-        }
-    }
-
     private void createNewPlace() {
         if (placeCreationView == null) {
             loadPlaceCreationView();
@@ -237,6 +259,17 @@ public final class SummaryViewController implements Initializable {
         }
         personCreationController.setEditionMode(EditionMode.CREATION);
         showModalStage(personCreationView);
+    }
+
+    private void importActivities() {
+
+        if (activitiesImportView == null) {
+            loadActivitiesImportView();
+        } else {
+            activitiesImportController.reset();
+        }
+        activitiesImportController.setEditionMode(EditionMode.CREATION);
+        showModalStage(activitiesImportView);
     }
 
     private void editPlace() {
@@ -299,6 +332,17 @@ public final class SummaryViewController implements Initializable {
         personCreationController.addPropertyChangeListener(this::handlePersonCreationControllerChanges);
     }
 
+    private void loadActivitiesImportView() {
+        FXMLLoader loader = new FXMLLoader(PlaceCreationViewController.class.getResource("ActivitiesImportView.fxml"));
+        try {
+            activitiesImportView = loader.load();
+        } catch (IOException ex) {
+            LOG.log(Level.SEVERE, "Could not load ActivitiesImportView ::  {0}", new Object[]{ex});
+        }
+        activitiesImportController = loader.getController();
+        activitiesImportController.addPropertyChangeListener(this::handleActivitiesImportControllerChanges);
+    }
+
     private void handlePlaceCreationControllerChanges(PropertyChangeEvent event) {
         Place place;
         switch (event.getPropertyName()) {
@@ -308,7 +352,7 @@ public final class SummaryViewController implements Initializable {
                 if (place.isRootPlace()) {
                     project.addHighLevelPlace(place);
                 }
-                updatePlacesTab();
+                updatePlaces();
             }
 
             case PlaceCreationViewController.PLACE_EDITIED -> {
@@ -319,7 +363,7 @@ public final class SummaryViewController implements Initializable {
                     project.addHighLevelPlace(place);
                 }
                 modalStage.hide();
-                updatePlacesTab();
+                updatePlaces();
             }
             case PlaceCreationViewController.CANCEL_PLACE_CREATION ->
                 modalStage.hide();
@@ -333,11 +377,11 @@ public final class SummaryViewController implements Initializable {
             case GpsFxProject.HIGH_LEVEL_PLACE_ADDED:
             case GpsFxProject.PLACE_REMOVED:
             case GpsFxProject.PLACE_ADDED:
-                runLater(this::updatePlacesTab);
+                runLater(this::updatePlaces);
                 break;
             case GpsFxProject.PERSON_ADDED:
             case GpsFxProject.PERSON_REMOVED:
-                runLater(this::updatePersonTab);
+                runLater(this::updatePersons);
                 break;
             case GpsFxProject.IS_IN_SYNC_CHANGED:
                 // ignore
@@ -354,11 +398,11 @@ public final class SummaryViewController implements Initializable {
                 person = (Person) event.getNewValue();
                 modalStage.hide();
                 project.addPerson(person);
-                updatePersonTab();
+                updatePersons();
                 break;
             case PersonCreationViewController.PERSON_EDITIED:
                 modalStage.hide();
-                updatePersonTab();
+                updatePersons();
                 break;
             case PersonCreationViewController.CANCEL_PERSON_CREATION:
                 modalStage.hide();
@@ -368,11 +412,15 @@ public final class SummaryViewController implements Initializable {
         }
     }
 
+    private void handleActivitiesImportControllerChanges(PropertyChangeEvent event) {
+
+    }
+
     private void handlePersonFactoryEvents(PropertyChangeEvent event) {
-        updatePersonTab();
+        updatePersons();
     }
 
     private void handlePlacesFactoryEvents(PropertyChangeEvent event) {
-        updatePlacesTab();
+        updatePlaces();
     }
 }

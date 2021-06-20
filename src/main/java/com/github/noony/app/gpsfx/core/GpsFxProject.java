@@ -76,7 +76,7 @@ public class GpsFxProject {
     }
 
     public boolean addHighLevelPlace(Place aPlace) {
-        if (!hightLevelPlaces.contains(aPlace)) {
+        if (aPlace.isRootPlace()) {
             hightLevelPlaces.add(aPlace);
             if (!allPlaces.containsKey(aPlace.getName())) {
                 allPlaces.put(aPlace.getName(), aPlace);

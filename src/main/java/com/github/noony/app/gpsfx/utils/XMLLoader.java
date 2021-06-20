@@ -21,6 +21,14 @@ import com.github.noony.app.gpsfx.core.GpsFxProject;
 import com.github.noony.app.gpsfx.core.GpsFxProjectFactory;
 import com.github.noony.app.gpsfx.core.Person;
 import com.github.noony.app.gpsfx.core.PersonFactory;
+import com.github.noony.app.gpsfx.core.Place;
+import com.github.noony.app.gpsfx.core.PlaceFactory;
+import com.github.noony.app.gpsfx.core.PlaceLevel;
+import static com.github.noony.app.gpsfx.utils.XMLSaver.COLOR_ATR;
+import static com.github.noony.app.gpsfx.utils.XMLSaver.ID_ATR;
+import static com.github.noony.app.gpsfx.utils.XMLSaver.NAME_ATR;
+import static com.github.noony.app.gpsfx.utils.XMLSaver.PLACE_ELEMENT;
+import static com.github.noony.app.gpsfx.utils.XMLSaver.PLACE_LEVEL_ATR;
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
@@ -76,6 +84,12 @@ public final class XMLLoader {
                             }
                             case XMLSaver.ACTIVITIES_GROUP ->
                                 System.err.println("TODO");
+                            case XMLSaver.PLACES_GROUP -> {
+                                List<Place> places = parsePlaces(element, null);
+                                places.stream()
+                                        .filter(p -> p.isRootPlace())
+                                        .forEach(p -> project.addHighLevelPlace(p));
+                            }
                             default ->
                                 throw new UnsupportedOperationException("Unknown element :: " + element.getTagName());
                         }
@@ -116,5 +130,31 @@ public final class XMLLoader {
         person.setPictureName(pictureName);
         return person;
     }
+
+
+    private static List<Place> parsePlaces(Element placesRootElement, Place parentPlace) {
+        List<Place> places = new LinkedList<>();
+        NodeList placeElements = placesRootElement.getChildNodes();
+        for (int i = 0; i < placeElements.getLength(); i++) {
+            if (placeElements.item(i).getNodeName().equals(PLACE_ELEMENT)) {
+                Element e = (Element) placeElements.item(i);
+                Place p = parsePlace(e, parentPlace);
+                places.add(p);
+            }
+        }
+        return places;
+    }
+
+    private static Place parsePlace(Element placeElement, Place parentPlace) {
+        // <place color="0xf5deb3ff" id="1" level="GALAXY" name="Galaxy">
+        Color color = Color.valueOf(placeElement.getAttribute(COLOR_ATR));
+        long id = Long.parseLong(placeElement.getAttribute(ID_ATR));
+        PlaceLevel level = PlaceLevel.valueOf(placeElement.getAttribute(PLACE_LEVEL_ATR));
+        String name = placeElement.getAttribute(NAME_ATR);
+        Place place = PlaceFactory.createPlace(id, name, level, parentPlace, color);
+        parsePlaces(placeElement, place);
+        return place;
+    }
+
 
 }
